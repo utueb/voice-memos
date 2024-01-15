@@ -1,11 +1,23 @@
 import { Button } from "react-bootstrap";
 
-export function ToggleButton({ icons, state, setState, disabled, purpose }) {
+export function ToggleButton({
+  icons,
+  actions,
+  state,
+  setState,
+  disabled,
+  purpose,
+}) {
+  function handleClick() {
+    setState(!state);
+    !state && actions[0]();
+    state && actions[1]();
+  }
   return (
     <Button
       variant="danger"
       className="bg-gradient fs-5 d-flex justify-content-center"
-      onClick={() => setState(!state)}
+      onClick={handleClick}
       disabled={disabled}
       title={purpose}
     >

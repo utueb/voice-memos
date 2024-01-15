@@ -1,10 +1,14 @@
 export function TimeComponent({ seconds }) {
-  const minutes = Math.floor(seconds / 60);
+  const min = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const sec = (seconds % 60).toString().padStart(2, "0");
+
   return (
     <time className="fw-bold fs-5 mx-2 d-flex justify-content-center text-white">
-      {minutes}
+      {!isNaN(min) ? min : "--"}
       <span className="mx-1">:</span>
-      {seconds % 60}
+      {!isNaN(sec) ? sec : "--"}
     </time>
   );
 }
