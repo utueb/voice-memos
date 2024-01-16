@@ -62,6 +62,7 @@ export function useAudioRecorder(
         setIsPaused(false);
       }
     }
+
     return seconds;
   };
 
