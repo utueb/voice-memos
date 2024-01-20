@@ -1,29 +1,31 @@
-import { Row, Col, ButtonGroup, Button } from "react-bootstrap";
-import { useEffect, useRef, useState } from "react";
+import { Row, Col, ButtonGroup, Button, Placeholder } from "react-bootstrap";
+import { useEffect, useState } from "react";
 import {
   PauseFill,
   CaretRightFill,
   RewindBtnFill,
   FastForwardBtnFill,
+  InfoCircleFill,
 } from "react-bootstrap-icons";
 import { ToggleButton } from "./ToggleButton";
 import { TimeComponent } from "./TimeComponent";
 import { Range } from "./Range";
 import { PlayBackSpeed } from "./PlayBackSpeed";
 
-export function AudioPlayer({ src, duration }) {
-  // TODO: only allow one audioplayer to play at a time
-  const audioRef = useRef();
-  const actions = {
-    play: () => audioRef.current.play(),
-    pause: () => audioRef.current.pause(),
-    rewindAudio: (seconds) => (audioRef.current.currentTime += seconds),
-  };
-  const [isPlaying, setIsPlaying] = useState(false);
+export function AudioPlayer({
+  src,
+  duration,
+  audioRef,
+  actions,
+  isPlaying,
+  setIsPlaying,
+}) {
   const [currentTime, setCurrentTime] = useState(0);
+
   useEffect(() => {
     const handleTimeUpdate = () => {
-      setCurrentTime(Math.round(audioRef.current.currentTime));
+      const time = Math.ceil(audioRef.current.currentTime);
+      setCurrentTime(time > duration ? duration : time);
     };
 
     const element = audioRef.current.addEventListener(
@@ -35,18 +37,48 @@ export function AudioPlayer({ src, duration }) {
       if (element !== undefined)
         element.removeEventListener("timeupdate", handleTimeUpdate);
     };
-  }, []);
-
+  }, [audioRef, duration]);
   return (
     <Row className="justify-content-center py-2">
       <Col
         xs={12}
+        sm={10}
+        md={8}
         lg={10}
         xl={8}
-        className="d-flex align-items-center flex-wrap rounded py-2 py-3 audio-player"
+        className="d-flex align-items-center flex-wrap rounded px-4 py-3 audio-player justify-content-center justify-content-sm-start"
       >
         <audio controls src={src} ref={audioRef} className="hide-audio" />
-        <Range additionalClasses={"flex-grow-1 mb-1"} />
+        <div className="d-flex flex-column-reverse flex-sm-row w-100 align-items-start align-items-sm-center mb-3 mb-sm-1">
+          <span className="d-inline-flex align-items-center fw-bold text-white">
+            <TimeComponent seconds={currentTime} />/
+            <TimeComponent seconds={duration} />
+          </span>
+          {audioRef.current && (
+            <Range
+              rangePurpose={"audio"}
+              additionalClasses={"flex-grow-1"}
+              maxValue={duration}
+              currentValue={audioRef.current.currentTime}
+              updateCurrentValue={actions.updateAudio}
+              initialPercentage={audioRef.current.currentTime / duration}
+              play={actions.play}
+              pause={actions.pause}
+              isPlaying={isPlaying}
+            />
+          )}
+          {!audioRef.current && (
+            <>
+              <InfoCircleFill
+                title="you must start playing for range to load"
+                className="text-white fs-5 mx-2"
+              />
+              <Placeholder as="p" animation="glow" className="w-100 mb-0">
+                <Placeholder xs={12} bg={"secondary"} />
+              </Placeholder>
+            </>
+          )}
+        </div>
         <ButtonGroup>
           <Button
             variant="danger"
@@ -76,11 +108,7 @@ export function AudioPlayer({ src, duration }) {
             <FastForwardBtnFill />
           </Button>
         </ButtonGroup>
-        <span className="d-inline-flex align-items-center fw-bold text-white">
-          <TimeComponent seconds={currentTime} />/
-          <TimeComponent seconds={duration} />
-        </span>
-        <PlayBackSpeed />
+        <PlayBackSpeed playBackRate={actions.playBackRate} />
       </Col>
     </Row>
   );

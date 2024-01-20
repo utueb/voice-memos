@@ -1,10 +1,24 @@
 #header {
   background-color: rgb(37, 37, 37);
+  position: relative;
 }
 .dropdown-item.active,
 .dropdown-item:active {
   background-color: var(--bs-danger) !important;
 }
+
+#playback-speed-dropdown {
+  width: 4.125rem;
+  text-align: center;
+  justify-content: center;
+}
+.dropdown-menu[aria-labelledby="playback-speed-dropdown"] {
+  min-width: 6.25rem;
+}
+.progress-bar {
+  transition: width 1s;
+}
+
 .hide-audio {
   pointer-events: none;
   visibility: hidden;
@@ -17,16 +31,20 @@
 }
 .volume-container {
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 1fr 1fr 3fr;
   align-items: center;
   gap: 0.3rem;
   margin-left: auto;
   padding: 0.2rem 0.7rem;
 }
+.volume-container h3 {
+  width: 2.5rem;
+}
 .volume-container .custom-range {
   visibility: hidden;
   pointer-events: none;
 }
+
 .volume-container:hover .custom-range {
   visibility: visible;
   pointer-events: all;
@@ -34,9 +52,61 @@
 .volume-container:hover {
   background-color: rgb(57, 57, 57);
 }
-#playback-speed-dropdown {
-  display: flex;
+.dropdown-container-positioning {
+  position: relative !important;
+}
+.dropdown-toggle {
+  display: flex !important;
   align-items: center;
-  font-weight: bold;
+  font-weight: bold !important;
   background-image: var(--bs-gradient) !important;
+}
+.time-component {
+  font-size: 1.25rem;
+}
+@media screen and (max-width: 700px) {
+  .time-component {
+    font-size: 1rem;
+  }
+}
+@media screen and (max-width: 576px) {
+  .dropdown-menu[aria-labelledby="playback-speed-dropdown"] {
+    position: absolute;
+    left: 0 !important;
+    right: 0 !important;
+    top: 100% !important;
+    transform: unset !important;
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+  .dropdown-menu[aria-labelledby="playback-speed-dropdown"] a {
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.375rem;
+    text-align: center;
+    border: var(--bs-body-bg) solid 0.1875rem;
+    flex: 0 0 25%;
+  }
+  .dropdown-container-positioning {
+    position: unset !important;
+  }
+  .dropdown-menu[aria-labelledby="playback-speed-dropdown"].show {
+    display: flex;
+    overflow-x: auto;
+  }
+}
+@keyframes focusRingAnimation {
+  0%,
+  100% {
+    --bs-focus-ring-color: rgba(var(--bs-danger-rgb), 0.5);
+  }
+  50% {
+    --bs-focus-ring-color: rgba(var(--bs-info-rgb), 0.5);
+  }
+}
+
+.custom-range:focus {
+  animation: focusRingAnimation 3s infinite;
+  box-shadow: var(--bs-focus-ring-x, 0) var(--bs-focus-ring-y, 0)
+    var(--bs-focus-ring-blur, 0) 0.35rem var(--bs-focus-ring-color);
 }

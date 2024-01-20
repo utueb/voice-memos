@@ -1,20 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { VolumeMuteFill, VolumeUpFill } from "react-bootstrap-icons";
 import { ToggleButton } from "./ToggleButton";
 import { Range } from "./Range";
 
-export function Volume() {
+export function Volume({
+  play,
+  pause,
+  isPlaying,
+  isSrcExists,
+  updateVolume,
+  toggleMute,
+}) {
   const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(false);
-  const [rangeValue, setRangeValue] = useState();
+  const [volume, setVolume] = useState(100);
 
-  //TODO: make range increase or decrease volume and the button mute/unmute it
-  // TODO: make this single volume component affect the volume of all audios
+  function mute() {
+    toggleMute(true);
+  }
+  function unmute() {
+    toggleMute(false);
+  }
+
+  useEffect(() => {
+    if (!isSrcExists) return;
+    updateVolume(volume / 100);
+  }, [volume, updateVolume, isSrcExists]);
+
   return (
     <div className="volume-container rounded">
+      <h3 className="mb-0 mx-1 text-white text-center">{volume}</h3>
       <ToggleButton
-        icons={[<VolumeMuteFill />, <VolumeUpFill />]}
-        // actions={[actions.play, actions.pause]}
+        icons={[<VolumeUpFill />, <VolumeMuteFill />]}
+        actions={[mute, unmute]}
         state={isMuted}
         setState={setIsMuted}
         disabled={false}
@@ -22,7 +39,29 @@ export function Volume() {
         size={"sm"}
       />
 
-      <Range additionalClasses={""} />
+      {isSrcExists ? (
+        <Range
+          rangePurpose={"volume"}
+          additionalClasses={""}
+          maxValue={100}
+          currentValue={volume}
+          updateCurrentValue={setVolume}
+          initialPercentage={volume / 100}
+          play={play}
+          pause={pause}
+          isPlaying={isPlaying}
+        />
+      ) : (
+        <Range
+          rangePurpose={"volume"}
+          additionalClasses={""}
+          maxValue={100}
+          currentValue={volume}
+          updateCurrentValue={setVolume}
+          initialPercentage={volume / 100}
+          isPlaying={isPlaying}
+        />
+      )}
     </div>
   );
 }

@@ -1,28 +1,36 @@
+import { useState } from "react";
 import { ButtonGroup, DropdownButton, Dropdown } from "react-bootstrap";
 
-export function PlayBackSpeed() {
-  // TODO: make this component change playback speed
+export function PlayBackSpeed({ playBackRate, audioRef }) {
+  const [activeItem, setActiveItem] = useState(3);
+  const speeds = Array.from({ length: 8 }, (_, index) => 0.25 * (index + 1));
+
   return (
     <DropdownButton
       as={ButtonGroup}
       id={`playback-speed-dropdown`}
       variant={"danger"}
       size={"md"}
-      className="bg-gradient mx-2"
-      title={" 1 "}
+      className="bg-gradient mx-2 dropdown-container-positioning"
+      title={` ${speeds[activeItem]} `}
       data-bs-theme="dark"
       drop={"end"}
     >
-      {Array.from({ length: 8 }, (_, index) => {
-        const num = (index + 1) / 4;
+      {speeds.map((speed) => {
+        const index = speeds.indexOf(speed);
+        const active = activeItem === index;
         return (
           <Dropdown.Item
-            eventKey={index + 1}
-            key={index + 1}
+            eventKey={index}
+            key={index}
             className="fw-bold"
-            active={num === 1}
+            active={active}
+            onClick={() => {
+              playBackRate(speed);
+              setActiveItem(index);
+            }}
           >
-            {num}
+            {speed}
           </Dropdown.Item>
         );
       })}
