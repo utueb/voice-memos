@@ -1,5 +1,14 @@
 import "./App.css";
-import { Container, Row, Col, ButtonGroup } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  ButtonGroup,
+  Form,
+  FloatingLabel,
+  Button,
+  InputGroup,
+} from "react-bootstrap";
 import RecordingIndicator from "./RecordingIndicator";
 import { useRef, useState } from "react";
 import {
@@ -7,19 +16,19 @@ import {
   CircleFill,
   PauseFill,
   CaretRightFill,
+  TrashFill,
+  Download,
 } from "react-bootstrap-icons";
 import { ToggleButton } from "./ToggleButton";
 import { TimeComponent } from "./TimeComponent";
-import { CancelBtn } from "./CancelBtn";
 import { useAudioRecorder } from "./useAudioRecorder";
 import { AudioPlayer } from "./AudioPlayer";
-import { Volume } from "./Volume";
 
 export default function App() {
-  alert(
-    "there will be errors with some code, maybe only with ones related to volume, at first time of page load, as there wont be a src"
-  );
-  alert("the last 1-2 seconds of recording isnt saved for some reason");
+  // alert(
+  //   "there will be errors with some code, maybe only with ones related to volume, at first time of page load, as there wont be a src"
+  // );
+  // alert("the last 1-2 seconds of recording isnt saved for some reason");
   const [isPaused, setIsPaused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
 
@@ -57,7 +66,7 @@ export default function App() {
       <Container fluid id="header" className="shadow-lg">
         <Row className="justify-content-center">
           <Col xs={12} lg={10} xl={8} className="p-0">
-            <header className="d-flex py-2 px-3 align-items-center ">
+            <header className="d-flex py-2 px-3 align-items-center">
               <img src="favicon.ico" alt="icon" className="me-3" />
               <ButtonGroup>
                 <ToggleButton
@@ -65,7 +74,7 @@ export default function App() {
                   actions={[recorder.startAudio, recorder.endAudio]}
                   state={isRecording}
                   setState={setIsRecording}
-                  disabled={recorder.seconds < 3 && isRecording}
+                  disabled={recorder.totalSeconds < 3 && isRecording}
                   purpose={"record"}
                   size={"sm"}
                 />
@@ -81,21 +90,8 @@ export default function App() {
               </ButtonGroup>
               {isRecording && (
                 <>
-                  <TimeComponent seconds={recorder.seconds} />
+                  <TimeComponent seconds={recorder.totalSeconds} />
                   <RecordingIndicator isPaused={isPaused} />
-                </>
-              )}
-              {!isRecording && (
-                <>
-                  <Volume
-                    setIsPaused={setIsPaused}
-                    play={actions.play}
-                    pause={actions.pause}
-                    isPlaying={isPlaying}
-                    isSrcExists={recorder.audioSource !== ""}
-                    updateVolume={actions.updateVolume}
-                    toggleMute={actions.toggleMute}
-                  />
                 </>
               )}
             </header>
@@ -103,14 +99,52 @@ export default function App() {
         </Row>
 
         {!isRecording && recorder.audioSource !== "" && (
-          <AudioPlayer
-            src={recorder.audioSource}
-            duration={recorder.seconds}
-            audioRef={audioRef}
-            actions={actions}
-            isPlaying={isPlaying}
-            setIsPlaying={setIsPlaying}
-          />
+          <>
+            <AudioPlayer
+              src={recorder.audioSource}
+              duration={recorder.totalSeconds}
+              audioRef={audioRef}
+              actions={actions}
+              isPlaying={isPlaying}
+              setIsPlaying={setIsPlaying}
+            />
+            <Row className="justify-content-center py-2">
+              <Col
+                xs={12}
+                sm={10}
+                md={8}
+                lg={10}
+                xl={8}
+                className="d-flex align-items-center flex-wrap p-0 justify-content-center"
+              >
+                <Form className="w-100">
+                  <InputGroup>
+                    <FloatingLabel controlId="floating-title" label="title">
+                      <Form.Control type="text" placeholder="title" required />
+                    </FloatingLabel>
+                    <ButtonGroup>
+                      <Button
+                        type="reset"
+                        variant="danger"
+                        title="delete"
+                        className="bg-gradient fs-5 d-flex justify-content-center align-items-center"
+                      >
+                        <TrashFill />
+                      </Button>
+                      <Button
+                        type="submit"
+                        variant="danger"
+                        title="save"
+                        className="bg-gradient fs-5 d-flex justify-content-center align-items-center"
+                      >
+                        <Download />
+                      </Button>
+                    </ButtonGroup>
+                  </InputGroup>
+                </Form>
+              </Col>
+            </Row>
+          </>
         )}
       </Container>
 

@@ -11,6 +11,7 @@ import { ToggleButton } from "./ToggleButton";
 import { TimeComponent } from "./TimeComponent";
 import { Range } from "./Range";
 import { PlayBackSpeed } from "./PlayBackSpeed";
+import { Volume } from "./Volume";
 
 export function AudioPlayer({
   src,
@@ -39,7 +40,10 @@ export function AudioPlayer({
     };
   }, [audioRef, duration]);
   return (
-    <Row className="justify-content-center py-2">
+    <Row
+      className="justify-content-center py-2 position-relative"
+      id="audio-margin"
+    >
       <Col
         xs={12}
         sm={10}
@@ -61,7 +65,7 @@ export function AudioPlayer({
               maxValue={duration}
               currentValue={audioRef.current.currentTime}
               updateCurrentValue={actions.updateAudio}
-              initialPercentage={audioRef.current.currentTime / duration}
+              initialPercentage={currentTime / duration}
               play={actions.play}
               pause={actions.pause}
               isPlaying={isPlaying}
@@ -79,36 +83,47 @@ export function AudioPlayer({
             </>
           )}
         </div>
-        <ButtonGroup>
-          <Button
-            variant="danger"
-            className="bg-gradient fs-5 d-flex justify-content-center"
-            onClick={() => actions.rewindAudio(-5)}
-            title={"rewind -5"}
-            size={"lg"}
-          >
-            <RewindBtnFill />
-          </Button>
-          <ToggleButton
-            icons={[<CaretRightFill />, <PauseFill />]}
-            actions={[actions.play, actions.pause]}
-            state={isPlaying}
-            setState={setIsPlaying}
-            disabled={false}
-            purpose={"pause/resume"}
-            size={"lg"}
+        <div className="w-100 controls-container">
+          <ButtonGroup className="controls">
+            <Button
+              variant="danger"
+              className="bg-gradient fs-5 d-flex justify-content-center"
+              onClick={() => actions.rewindAudio(-5)}
+              title={"rewind -5"}
+              size={"lg"}
+            >
+              <RewindBtnFill />
+            </Button>
+            <ToggleButton
+              icons={[<CaretRightFill />, <PauseFill />]}
+              actions={[actions.play, actions.pause]}
+              state={isPlaying}
+              setState={setIsPlaying}
+              disabled={false}
+              purpose={"pause/resume"}
+              size={"lg"}
+            />
+            <Button
+              variant="danger"
+              className="bg-gradient fs-5 d-flex justify-content-center"
+              onClick={() => actions.rewindAudio(5)}
+              title={"rewind 5"}
+              size={"lg"}
+            >
+              <FastForwardBtnFill />
+            </Button>
+          </ButtonGroup>
+          <PlayBackSpeed playBackRate={actions.playBackRate} />
+          <Volume
+            setIsPaused={!setIsPlaying}
+            play={actions.play}
+            pause={actions.pause}
+            isPlaying={isPlaying}
+            isSrcExists={src !== ""}
+            updateVolume={actions.updateVolume}
+            toggleMute={actions.toggleMute}
           />
-          <Button
-            variant="danger"
-            className="bg-gradient fs-5 d-flex justify-content-center"
-            onClick={() => actions.rewindAudio(5)}
-            title={"rewind 5"}
-            size={"lg"}
-          >
-            <FastForwardBtnFill />
-          </Button>
-        </ButtonGroup>
-        <PlayBackSpeed playBackRate={actions.playBackRate} />
+        </div>
       </Col>
     </Row>
   );

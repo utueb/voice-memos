@@ -16,7 +16,7 @@ export function Range({
   const rangeRef = useRef(null);
   const [rangeActive, setRangeActive] = useState(false);
   const [percentage, setPercentage] = useState(initialPercentage);
-  const atEnd = Math.ceil(currentValue) === maxValue;
+  const atEnd = Math.floor(currentValue) === maxValue;
   const [initialIsPlaying, setInitialIsPlaying] = useState(false);
   function handleMouseMove(e) {
     if (!rangeActive) return;

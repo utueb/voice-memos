@@ -28,7 +28,7 @@ export function Volume({
 
   return (
     <div className="volume-container rounded">
-      <h3 className="mb-0 mx-1 text-white text-center">{volume}</h3>
+      <h3 className="mb-0 ms-auto me-1 text-white text-center">{volume}</h3>
       <ToggleButton
         icons={[<VolumeUpFill />, <VolumeMuteFill />]}
         actions={[mute, unmute]}
@@ -36,7 +36,7 @@ export function Volume({
         setState={setIsMuted}
         disabled={false}
         purpose={"pause/resume"}
-        size={"sm"}
+        size={"lg"}
       />
 
       {isSrcExists ? (
