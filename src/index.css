@@ -6,6 +6,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: dimgrey !important;
+  text-transform: capitalize;
 }
 
 code {
@@ -38,4 +39,10 @@ body {
 
 ::-webkit-scrollbar-track {
   background-color: rgb(57, 57, 57);
+}
+
+.sm-height {
+  min-height: 2.375rem !important;
+  height: 2.375rem !important;
+  align-items: center;
 }

@@ -11,7 +11,7 @@ export function PlayBackSpeed({ playBackRate, audioRef }) {
       id={`playback-speed-dropdown`}
       variant={"danger"}
       size={"md"}
-      className="bg-gradient mx-4 dropdown-container-positioning"
+      className="bg-gradient mx-4 dropdown-container-positioning sm-height"
       title={` ${speeds[activeItem]} `}
       data-bs-theme="dark"
       drop={"end"}

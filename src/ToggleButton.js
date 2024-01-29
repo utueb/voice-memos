@@ -18,7 +18,7 @@ export function ToggleButton({
   return (
     <Button
       variant="danger"
-      className="bg-gradient fs-5 d-flex justify-content-center"
+      className="bg-gradient fs-5 d-flex justify-content-center sm-height"
       onClick={handleClick}
       disabled={disabled}
       title={purpose}

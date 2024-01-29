@@ -10,7 +10,7 @@ import {
   InputGroup,
 } from "react-bootstrap";
 import RecordingIndicator from "./RecordingIndicator";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Circle,
   CircleFill,
@@ -18,19 +18,24 @@ import {
   CaretRightFill,
   TrashFill,
   Download,
+  CaretRightSquareFill,
 } from "react-bootstrap-icons";
 import { ToggleButton } from "./ToggleButton";
 import { TimeComponent } from "./TimeComponent";
 import { useAudioRecorder } from "./useAudioRecorder";
 import { AudioPlayer } from "./AudioPlayer";
-
+import { ConfirmModal } from "./ConfirmModal";
+import { openDB } from "./openDB";
 export default function App() {
-  // alert(
-  //   "there will be errors with some code, maybe only with ones related to volume, at first time of page load, as there wont be a src"
-  // );
-  // alert("the last 1-2 seconds of recording isnt saved for some reason");
   const [isPaused, setIsPaused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [modalActive, setModalActive] = useState(false);
+  const [audioDataUpdated, setAudioDataUpdated] = useState(false);
+  const [recordedAudio, setRecordedAudio] = useState({
+    src: null,
+    totalSeconds: null,
+  });
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const recorder = useAudioRecorder(
     isRecording,
@@ -38,8 +43,15 @@ export default function App() {
     isPaused,
     setIsPaused
   );
+
+  const inputRef = useRef(null);
   const audioRef = useRef();
-  const [isPlaying, setIsPlaying] = useState(false);
+  function resetRecordedAudioState() {
+    setRecordedAudio({
+      src: null,
+      totalSeconds: null,
+    });
+  }
   const actions = {
     play: () => {
       audioRef.current.play();
@@ -61,6 +73,39 @@ export default function App() {
       audioRef.current.muted = volume;
     },
   };
+
+  function saveAudio(title) {
+    const audio = {
+      title,
+      date: new Date(),
+      blob: recordedAudio.blob,
+      totalSeconds: recordedAudio.totalSeconds,
+    };
+    openDB().then((db) => {
+      const transaction = db.transaction(["audioStore"], "readwrite");
+      const store = transaction.objectStore("audioStore");
+      const request = store.add(audio);
+
+      request.onsuccess = () => {
+        console.log("Audio data added to IndexedDB");
+        resetRecordedAudioState();
+      };
+
+      request.onerror = (event) => {
+        console.error(
+          "Error adding audio data to IndexedDB",
+          event.target.error
+        );
+      };
+    });
+  }
+
+  useEffect(() => {
+    setRecordedAudio({
+      src: recorder.audioSource,
+      totalSeconds: recorder.totalSeconds,
+    });
+  }, [recorder.audioSource, recorder.totalSeconds]);
   return (
     <>
       <Container fluid id="header" className="shadow-lg">
@@ -74,7 +119,7 @@ export default function App() {
                   actions={[recorder.startAudio, recorder.endAudio]}
                   state={isRecording}
                   setState={setIsRecording}
-                  disabled={recorder.totalSeconds < 3 && isRecording}
+                  disabled={recordedAudio.totalSeconds < 3 && isRecording}
                   purpose={"record"}
                   size={"sm"}
                 />
@@ -90,7 +135,7 @@ export default function App() {
               </ButtonGroup>
               {isRecording && (
                 <>
-                  <TimeComponent seconds={recorder.totalSeconds} />
+                  <TimeComponent seconds={recordedAudio.totalSeconds} />
                   <RecordingIndicator isPaused={isPaused} />
                 </>
               )}
@@ -98,11 +143,11 @@ export default function App() {
           </Col>
         </Row>
 
-        {!isRecording && recorder.audioSource !== "" && (
+        {!isRecording && recordedAudio.src !== null && (
           <>
             <AudioPlayer
-              src={recorder.audioSource}
-              duration={recorder.totalSeconds}
+              src={recordedAudio.src}
+              duration={recordedAudio.totalSeconds}
               audioRef={audioRef}
               actions={actions}
               isPlaying={isPlaying}
@@ -120,7 +165,12 @@ export default function App() {
                 <Form className="w-100">
                   <InputGroup>
                     <FloatingLabel controlId="floating-title" label="title">
-                      <Form.Control type="text" placeholder="title" required />
+                      <Form.Control
+                        type="text"
+                        placeholder="title"
+                        required
+                        ref={inputRef}
+                      />
                     </FloatingLabel>
                     <ButtonGroup>
                       <Button
@@ -128,6 +178,7 @@ export default function App() {
                         variant="danger"
                         title="delete"
                         className="bg-gradient fs-5 d-flex justify-content-center align-items-center"
+                        onClick={() => setModalActive(!modalActive)}
                       >
                         <TrashFill />
                       </Button>
@@ -135,6 +186,16 @@ export default function App() {
                         type="submit"
                         variant="danger"
                         title="save"
+                        onClick={(e) => {
+                          if (inputRef.current.value === "") return;
+                          e.preventDefault();
+                          saveAudio(inputRef.current.value);
+                          setAudioDataUpdated(true);
+                          resetRecordedAudioState();
+                        }}
+                        onMouseUp={() => {
+                          setAudioDataUpdated(false);
+                        }}
                         className="bg-gradient fs-5 d-flex justify-content-center align-items-center"
                       >
                         <Download />
@@ -147,16 +208,113 @@ export default function App() {
           </>
         )}
       </Container>
+      <ConfirmModal
+        modalActive={modalActive}
+        setModalActive={setModalActive}
+        resetRecordedAudioState={resetRecordedAudioState}
+      />
 
-      {/* <Container fluid className="shadow-lg bg-secondary">
+      <Container fluid className="shadow-lg bg-secondary">
         <Row className="justify-content-center">
           <Col xs={12} lg={10} xl={8} className="p-0">
-          
-          filters settings and stuff
-          
+            filters settings and stuff
+            {/* <AudioList audioDataUpdated={audioDataUpdated} /> */}
           </Col>
         </Row>
-      </Container> */}
+      </Container>
     </>
+  );
+}
+function AudioList({ audioDataUpdated }) {
+  const [audioList, setAudioList] = useState([]);
+  const [deleting, setDeleting] = useState(false);
+
+  function deleteAudio(id) {
+    openDB().then((db) => {
+      const transaction = db.transaction(["audioStore"], "readwrite");
+      const store = transaction.objectStore("audioStore");
+
+      const request = store.delete(id);
+
+      request.onsuccess = () => {
+        console.log(`Audio data with id ${id} deleted from IndexedDB`);
+      };
+
+      request.onerror = (event) => {
+        console.error(
+          `Error deleting audio data with id ${id} from IndexedDB`,
+          event.target.error
+        );
+      };
+    });
+  }
+
+  function renderAudios() {
+    openDB().then((db) => {
+      const objectStore = db
+        .transaction("audioStore")
+        .objectStore("audioStore");
+      objectStore.getAll().onsuccess = (event) => {
+        setAudioList(event.target.result);
+      };
+    });
+  }
+
+  useEffect(() => {
+    renderAudios();
+  }, []);
+  useEffect(() => {
+    if (!audioDataUpdated) return;
+    renderAudios();
+  }, [audioDataUpdated]);
+
+  useEffect(() => {
+    if (!deleting) return;
+    renderAudios();
+  }, [deleting]);
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}/${month}/${day}`;
+  }
+  return (
+    <ul>
+      {audioList.map((audio) => {
+        const src = URL.createObjectURL(audio.blob);
+        return (
+          <li key={audio.id}>
+            {audio.title}
+            <Button
+              type="reset"
+              variant="danger"
+              title="delete"
+              className="bg-gradient fs-5 d-flex justify-content-center align-items-center"
+            >
+              <CaretRightSquareFill />
+            </Button>
+            <audio src={src} controls></audio>
+            <TimeComponent seconds={audio.totalSeconds} />
+            <time>{formatDate(audio.date)}</time>
+            <Button
+              type="reset"
+              variant="danger"
+              title="delete"
+              className="bg-gradient fs-5 d-flex justify-content-center align-items-center"
+              onClick={(e) => {
+                deleteAudio(audio.id);
+                setDeleting(true);
+              }}
+              onMouseUp={() => {
+                setDeleting(false);
+              }}
+            >
+              <TrashFill />
+            </Button>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

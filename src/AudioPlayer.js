@@ -72,7 +72,7 @@ export function AudioPlayer({
             />
           )}
           {!audioRef.current && (
-            <>
+            <div className="d-flex w-100 align-items-center">
               <InfoCircleFill
                 title="you must start playing for range to load"
                 className="text-white fs-5 mx-2"
@@ -80,14 +80,14 @@ export function AudioPlayer({
               <Placeholder as="p" animation="glow" className="w-100 mb-0">
                 <Placeholder xs={12} bg={"secondary"} />
               </Placeholder>
-            </>
+            </div>
           )}
         </div>
         <div className="w-100 controls-container">
           <ButtonGroup className="controls">
             <Button
               variant="danger"
-              className="bg-gradient fs-5 d-flex justify-content-center"
+              className="bg-gradient fs-5 d-flex justify-content-center sm-height"
               onClick={() => actions.rewindAudio(-5)}
               title={"rewind -5"}
               size={"lg"}
@@ -101,11 +101,11 @@ export function AudioPlayer({
               setState={setIsPlaying}
               disabled={false}
               purpose={"pause/resume"}
-              size={"lg"}
+              size={"sm"}
             />
             <Button
               variant="danger"
-              className="bg-gradient fs-5 d-flex justify-content-center"
+              className="bg-gradient fs-5 d-flex justify-content-center sm-height"
               onClick={() => actions.rewindAudio(5)}
               title={"rewind 5"}
               size={"lg"}
