@@ -14,7 +14,7 @@ import { PlayBackSpeed } from "./PlayBackSpeed";
 import { Volume } from "./Volume";
 
 export function AudioPlayer({
-  src,
+  blob,
   duration,
   audioRef,
   actions,
@@ -22,6 +22,7 @@ export function AudioPlayer({
   setIsPlaying,
 }) {
   const [currentTime, setCurrentTime] = useState(0);
+  const [audioUrl, setAudioUrl] = useState(null);
 
   useEffect(() => {
     const handleTimeUpdate = () => {
@@ -39,6 +40,17 @@ export function AudioPlayer({
         element.removeEventListener("timeupdate", handleTimeUpdate);
     };
   }, [audioRef, duration]);
+
+  useEffect(() => {
+    const url = URL.createObjectURL(blob);
+
+    setAudioUrl(url);
+
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [blob]);
+
   return (
     <Row
       className="justify-content-center py-2 position-relative"
@@ -52,7 +64,7 @@ export function AudioPlayer({
         xl={8}
         className="d-flex align-items-center flex-wrap rounded px-4 py-3 audio-player justify-content-center justify-content-sm-start"
       >
-        <audio controls src={src} ref={audioRef} className="hide-audio" />
+        <audio controls src={audioUrl} ref={audioRef} className="hide-audio" />
         <div className="d-flex flex-column-reverse flex-sm-row w-100 align-items-start align-items-sm-center mb-3 mb-sm-1">
           <span className="d-inline-flex align-items-center fw-bold text-white">
             <TimeComponent seconds={currentTime} />/
@@ -119,7 +131,7 @@ export function AudioPlayer({
             play={actions.play}
             pause={actions.pause}
             isPlaying={isPlaying}
-            isSrcExists={src !== ""}
+            isSrcExists={audioUrl !== ""}
             updateVolume={actions.updateVolume}
             toggleMute={actions.toggleMute}
           />

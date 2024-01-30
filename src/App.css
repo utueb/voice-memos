@@ -196,3 +196,24 @@
     grid-column: 1/4;
   }
 }
+.saved-audio-index {
+  margin: 0.125rem 0.5rem;
+  padding: 0.25rem 0.875rem;
+  border-radius: 0.75rem;
+  background-color: rgb(37, 37, 37);
+  background-image: var(--bs-gradient) !important;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.saved-audio-title {
+  font-size: 1.1rem !important;
+  line-height: 1.1;
+}
+.audio-list-container {
+  background-color: rgb(81 99 103) !important;
+}
+.audio-list-container .logo-grayscale {
+  width: 4rem;
+  height: 4rem;
+  border: 0.5rem solid black;
+}

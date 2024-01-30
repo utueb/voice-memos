@@ -9,7 +9,6 @@ export function useAudioRecorder(
 ) {
   const mediaRecorderRef = useRef(null);
   const [audioBlob, setAudioBlob] = useState(null);
-  const [audioSource, setAudioSource] = useState(null);
 
   const { totalSeconds, start, pause, reset } = useStopwatch();
 
@@ -24,8 +23,6 @@ export function useAudioRecorder(
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           const blob = new Blob([event.data], { type: "audio/wav" });
-          const audioUrl = URL.createObjectURL(blob);
-          setAudioSource(audioUrl);
           setAudioBlob(blob);
         }
       };
@@ -85,7 +82,6 @@ export function useAudioRecorder(
     endAudio,
     pauseAudio,
     resumeAudio,
-    audioSource,
     audioBlob,
     isRecording,
     isPaused,
