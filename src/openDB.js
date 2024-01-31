@@ -24,4 +24,46 @@ const openDB = () => {
   });
 };
 
-export { openDB };
+function saveDb(audio) {
+  return openDB().then((db) => {
+    const transaction = db.transaction(["audioStore"], "readwrite");
+    const store = transaction.objectStore("audioStore");
+    const request = store.add(audio);
+
+    request.onsuccess = () => {
+      console.log("success");
+    };
+
+    request.onerror = (event) => {
+      console.error(event.target.error);
+    };
+  });
+}
+function renderAudioDb(setList) {
+  openDB().then((db) => {
+    const objectStore = db.transaction("audioStore").objectStore("audioStore");
+    objectStore.getAll().onsuccess = (event) => {
+      setList(event.target.result);
+    };
+  });
+}
+function deleteAudioDb(id) {
+  openDB().then((db) => {
+    const transaction = db.transaction(["audioStore"], "readwrite");
+    const store = transaction.objectStore("audioStore");
+
+    const request = store.delete(id);
+
+    request.onsuccess = () => {
+      console.log(`Audio data with id ${id} deleted from IndexedDB`);
+    };
+
+    request.onerror = (event) => {
+      console.error(
+        `Error deleting audio data with id ${id} from IndexedDB`,
+        event.target.error
+      );
+    };
+  });
+}
+export { openDB, saveDb, renderAudioDb, deleteAudioDb };

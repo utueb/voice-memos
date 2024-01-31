@@ -1,0 +1,18 @@
+/* Progress Bar */
+.progress-bar {
+  transition: width 1s;
+}
+
+.custom-range:focus {
+  animation: focusRingAnimation infinite 1s;
+  border-radius: 0.5rem;
+}
+@keyframes focusRingAnimation {
+  0%,
+  100% {
+    border: 0.25rem solid rgba(var(--bs-danger-rgb), 0.5);
+  }
+  50% {
+    border: 0.25rem solid rgba(var(--bs-info-rgb), 0.5);
+  }
+}

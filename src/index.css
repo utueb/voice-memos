@@ -46,3 +46,19 @@ body {
   height: 2.375rem !important;
   align-items: center;
 }
+#root {
+  display: flex;
+  flex-direction: column;
+}
+/* Fill Page Styles */
+.fill-page {
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  margin-bottom: 1rem;
+}
+
+.fill-page > * {
+  height: 0px;
+  overflow-y: auto;
+  min-height: 100%;
+}

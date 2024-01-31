@@ -12,6 +12,7 @@ import { TimeComponent } from "./TimeComponent";
 import { Range } from "./Range";
 import { PlayBackSpeed } from "./PlayBackSpeed";
 import { Volume } from "./Volume";
+import "../styles/AudioPlayer.css";
 
 export function AudioPlayer({
   blob,
@@ -42,8 +43,8 @@ export function AudioPlayer({
   }, [audioRef, duration]);
 
   useEffect(() => {
+    URL.revokeObjectURL(audioUrl);
     const url = URL.createObjectURL(blob);
-
     setAudioUrl(url);
 
     return () => {
@@ -52,10 +53,7 @@ export function AudioPlayer({
   }, [blob]);
 
   return (
-    <Row
-      className="justify-content-center py-2 position-relative"
-      id="audio-margin"
-    >
+    <Row className="justify-content-center py-2 position-relative dropdown-margin">
       <Col
         xs={12}
         sm={10}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { VolumeMuteFill, VolumeUpFill } from "react-bootstrap-icons";
 import { ToggleButton } from "./ToggleButton";
 import { Range } from "./Range";
+import "../styles/Volume.css";
 
 export function Volume({
   play,

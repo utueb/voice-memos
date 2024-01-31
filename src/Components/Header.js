@@ -1,3 +1,4 @@
+import "../styles/Header.css";
 import { Container, Row, Col, ButtonGroup } from "react-bootstrap";
 import RecordingIndicator from "./RecordingIndicator";
 import {

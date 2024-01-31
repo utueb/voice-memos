@@ -1,0 +1,10 @@
+/* Audio List Styles */
+.audio-list-container {
+  background-color: rgb(81 99 103) !important;
+}
+
+.audio-list-container .logo-grayscale {
+  width: 4rem;
+  height: 4rem;
+  border: 0.5rem solid black;
+}

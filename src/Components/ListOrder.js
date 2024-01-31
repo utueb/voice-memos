@@ -1,6 +1,6 @@
 import { useState } from "react";
 import CustomDropdown from "./CustomDropdown";
-export function ListOrder({ changeOrder }) {
+export function ListOrder({ setOrder }) {
   const [activeItem, setActiveItem] = useState(0);
   const sortings = [
     "Date ↑",
@@ -11,7 +11,7 @@ export function ListOrder({ changeOrder }) {
     " Duration ↓",
   ];
   const onSelect = (index) => {
-    // changeOrder(this function does not exist yet);
+    setOrder(sortings[index]);
   };
   return (
     <CustomDropdown
@@ -20,6 +20,7 @@ export function ListOrder({ changeOrder }) {
       setActiveItem={setActiveItem}
       onSelect={onSelect}
       title={sortings}
+      id={"list-order-dropdown"}
     />
   );
 }

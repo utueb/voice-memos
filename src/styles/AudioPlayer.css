@@ -1,0 +1,46 @@
+/* Hide Audio */
+.hide-audio {
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  max-width: 0rem;
+  max-height: 0rem;
+} /* Audio Player */
+.audio-player {
+  background-color: rgb(57, 57, 57);
+}
+
+/* Controls Container */
+.controls-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr 4fr;
+}
+
+/* Responsive Styles for Medium Screens */
+@media screen and (max-width: 1024px) {
+  .controls-container {
+    grid-template-columns: 4fr 3fr 2fr 8fr;
+  }
+}
+
+/* Responsive Styles for Small Screens */
+@media screen and (max-width: 820px) {
+  .controls-container {
+    grid-template-columns: 2fr 5fr 2fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  .controls-container .controls {
+    grid-column: 2;
+    margin-bottom: 0.5rem;
+  }
+  .controls-container .btn-group:has(#playback-speed-dropdown) {
+    grid-row: 2;
+  }
+}
+
+/* Responsive Styles for Extra Small Screens */
+@media screen and (max-width: 360px) {
+  .controls-container .controls {
+    grid-column: 1/4;
+  }
+}

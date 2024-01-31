@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ProgressBar } from "react-bootstrap";
+import "../styles/Range.css";
 
 export function Range({
   rangePurpose,
@@ -12,11 +13,11 @@ export function Range({
   pause,
   isPlaying,
 }) {
-  //TODO: use this to volume or rewind audos
   const rangeRef = useRef(null);
   const [rangeActive, setRangeActive] = useState(false);
   const [percentage, setPercentage] = useState(initialPercentage);
-  const atEnd = Math.floor(currentValue) === maxValue;
+  const atEnd = currentValue >= maxValue - 1;
+
   const [initialIsPlaying, setInitialIsPlaying] = useState(false);
   function handleMouseMove(e) {
     if (!rangeActive) return;
@@ -38,11 +39,10 @@ export function Range({
 
   useEffect(() => {
     if (atEnd && rangePurpose === "audio") {
-      pause?.();
-
       setTimeout(() => {
+        pause?.();
         updateCurrentValue(0);
-      }, 1000);
+      }, 2000);
     }
   }, [atEnd, pause, updateCurrentValue, rangePurpose]);
 

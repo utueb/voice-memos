@@ -1,11 +1,12 @@
 import "./App.css";
 import { useEffect, useRef, useState } from "react";
-import { useAudioRecorder } from "./useAudioRecorder";
-import { ConfirmModal } from "./ConfirmModal";
-import { openDB } from "./openDB";
-import AudioList from "./AudioList";
-import useAudioActions from "./useAudioActions";
-import { Header } from "./Header";
+import { useAudioRecorder } from "./CustomHooks/useAudioRecorder";
+import { ConfirmModal } from "./Components/ConfirmModal";
+import { saveDb } from "./openDB";
+import AudioList from "./Components/AudioList";
+import useAudioActions from "./CustomHooks/useAudioActions";
+import { Header } from "./Components/Header";
+
 export default function App() {
   const [isPaused, setIsPaused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -17,14 +18,17 @@ export default function App() {
     origin: null,
   });
   const [isPlaying, setIsPlaying] = useState(false);
+
   const inputRef = useRef(null);
   const audioRef = useRef(null);
+
   const recorder = useAudioRecorder(
     isRecording,
     setIsRecording,
     isPaused,
     setIsPaused
   );
+
   const actions = useAudioActions(audioRef, setIsPlaying);
 
   function resetRecordedAudioState() {
@@ -47,29 +51,9 @@ export default function App() {
       totalSeconds: recordedAudio.totalSeconds,
     };
 
-    function saveDb() {
-      return openDB().then((db) => {
-        const transaction = db.transaction(["audioStore"], "readwrite");
-        const store = transaction.objectStore("audioStore");
-        const request = store.add(audio);
-
-        request.onsuccess = () => {
-          console.log("Audio data added to IndexedDB");
-          resetRecordedAudioState();
-        };
-
-        request.onerror = (event) => {
-          console.error(
-            "Error adding audio data to IndexedDB",
-            event.target.error
-          );
-        };
-      });
-    }
-
     setTimeout(() => {
       setAudioDataUpdated(true);
-      saveDb();
+      saveDb(audio);
       resetRecordedAudioState();
     }, 100);
   }
@@ -81,6 +65,7 @@ export default function App() {
       origin: "new recording",
     });
   }, [recorder.audioBlob, recorder.totalSeconds]);
+
   return (
     <>
       <Header
